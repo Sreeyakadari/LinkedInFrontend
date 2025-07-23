@@ -14,6 +14,16 @@ export default function ProfilePage() {
   const [userProfile, setUserProfile] = useState({});
   const [userPosts, setUserPosts] = useState([]);
   const dispatch = useDispatch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [inputData, setInputData] = useState({
+    company: "",
+    position: "",
+    years: "",
+  });
+  const handleWorkInputChange = (e) => {
+    const { name, value } = e.target;
+    setInputData({ ...inputData, [name]: value });
+  };
 
   useEffect(() => {
     dispatch(getAboutUser({ token: localStorage.getItem("token") }));
@@ -48,6 +58,22 @@ export default function ProfilePage() {
     dispatch(getAboutUser({ token: localStorage.getItem("token") }));
   };
 
+  const updateProfileData = async () => {
+    const request = await clientServer.post("/user_update", {
+      token: localStorage.getItem("token"),
+      name: userProfile.userId.name,
+    });
+
+    const response = await clientServer.post("/update_profile_data", {
+      token: localStorage.getItem("token"),
+      bio: userProfile.bio,
+      currentPost: userProfile.currentPost,
+      pastWork: userProfile.pastWork,
+      education: userProfile.education,
+    });
+    dispatch(getAboutUser({ token: localStorage.getItem("token") }));
+  };
+
   return (
     <UserLayout>
       <DashboardLayout>
@@ -60,7 +86,14 @@ export default function ProfilePage() {
               >
                 <p>Edit</p>
               </label>
-              <input type="file" id="profilePictureUpload" />
+              <input
+                onChange={(e) => {
+                  updateProfilePictue(e.target.files[0]);
+                }}
+                hidden
+                type="file"
+                id="profilePictureUpload"
+              />
               <img
                 src={`${BASE_URL}/${userProfile.userId.profilePicture}`}
                 alt="backdrop"
@@ -77,14 +110,34 @@ export default function ProfilePage() {
                       gap: "1.2rem",
                     }}
                   >
-                    <h2>{userProfile.userId.name}</h2>
-                    <p style={{ color: "grey" }}>
+                    <input
+                      className={styles.nameEdit}
+                      type="text"
+                      value={userProfile.userId.name}
+                      onChange={(e) => {
+                        setUserProfile({
+                          ...userProfile,
+                          userId: {
+                            ...userProfile.userId,
+                            name: e.target.value,
+                          },
+                        });
+                      }}
+                    />
+                    <p contentEditable style={{ color: "grey" }}>
                       @{userProfile.userId.username}
                     </p>
                   </div>
 
                   <div>
-                    <p>{userProfile.bio}</p>
+                    <textarea
+                      value={userProfile.bio}
+                      onChange={(e) => {
+                        setUserProfile({ ...userProfile, bio: e.target.value });
+                      }}
+                      rows={Math.max(3, Math.cell(userProfile.bio.length / 80))}
+                      style={{ width: "100%" }}
+                    />
                   </div>
                 </div>
                 <div style={{ flex: "0.2" }}>
@@ -133,6 +186,74 @@ export default function ProfilePage() {
                     </div>
                   );
                 })}
+                <button
+                  className={styles.addWorkButton}
+                  onClick={() => {
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Add Work
+                </button>
+              </div>
+            </div>
+            {userProfile != authState.user && (
+              <div
+                onClick={() => {
+                  updateProfileData();
+                }}
+                className={styles.updateProfileBtn}
+              >
+                Update Profile
+              </div>
+            )}
+          </div>
+        )}
+
+        {isModalOpen && (
+          <div
+            onClick={() => {
+              setIsModalOpen(false);
+            }}
+            className={styles.commentsContainer}
+          >
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className={styles.allCommentsContainer}
+            >
+              <input
+                onChange={handleWorkInputChange}
+                name="company"
+                className={styles.inputField}
+                type="text"
+                placeholder="Company name"
+              ></input>
+              <input
+                onChange={handleWorkInputChange}
+                name="position"
+                className={styles.inputField}
+                type="text"
+                placeholder="Role"
+              ></input>
+              <input
+                onChange={handleWorkInputChange}
+                name="years"
+                className={styles.inputField}
+                type="number"
+                placeholder="Years of Experience"
+              ></input>
+              <div
+                onClick={() => {
+                  setUserProfile({
+                    ...userProfile,
+                    pastWork: [...userProfile.pastWork, inputData],
+                  });
+                  setIsModalOpen(false);
+                }}
+                className={styles.updateProfileBtn}
+              >
+                Add Work
               </div>
             </div>
           </div>

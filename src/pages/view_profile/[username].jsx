@@ -70,7 +70,7 @@ export default function ViewProfilePage({ userProfile }) {
         setIsConnectionNull(false);
       }
     }
-  }, [authState.connections,authState.connectionRequest]);
+  }, [authState.connections, authState.connectionRequest]);
 
   const searchParamers = useSearchParams();
 
@@ -90,7 +90,7 @@ export default function ViewProfilePage({ userProfile }) {
             />
           </div>
           <div className={styles.profileContainer__details}>
-            <div style={{ display: "flex", gap: "0.7rem" }}>
+            <div className={styles.profileContainer__flex}>
               <div style={{ flex: "0.8" }}>
                 <div
                   style={{

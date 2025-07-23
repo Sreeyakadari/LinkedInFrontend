@@ -41,6 +41,13 @@
   display: flex;
 }
 
+.card__profileContainer > img {
+  width: 3.4rem;
+  height: auto;
+  height: 3.4rem;
+  object-fit: cover;
+}
+
 /* .backDrop {
   width: 3.4rem;
   height: auto;
@@ -62,7 +69,7 @@
   transition: all 0.4s;
   cursor: pointer;
   color: white;
-  opacity: 0.0;
+  opacity: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -98,4 +105,82 @@
   padding-block: 1rem;
   border-radius: 10px;
   box-shadow: 10px 10px 15px rgb(173, 173, 173);
+}
+
+.profileContainer__details input {
+  outline: none;
+  border-style: none;
+  padding-inline: 10px;
+  padding-block: 9px;
+  width: fit-content;
+}
+
+.nameEdit {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.updateProfileBtn {
+  padding-inline: 0.8rem;
+  padding-block: 0.3rem;
+  background: rgba(3, 93, 183, 0.905);
+  outline: none;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.profileContainer__details textarea {
+  outline: none;
+  border: none;
+  padding-inline: 10px;
+  padding-block: 9px;
+  font-family: "Poppins" !important;
+  font-size: 1.1rem;
+}
+
+.addWorkButton {
+  padding-inline: 1.3rem;
+  background: white;
+  border: 1px dotted silver;
+  border-radius: 10px;
+  padding-block: 1.2rem;
+  cursor: pointer;
+}
+
+.commentsContainer {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.allCommentsContainer {
+  width: 40vw;
+  height: fit-content;
+  background: white;
+  border-radius: 10px;
+  position: relative;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.inputField {
+  padding-inline: 1.3rem;
+  padding-block: 0.8rem;
+  outline: none;
+  border-radius: 10px;
+  border: 1px solid silver;
+  width: 100%;
 }

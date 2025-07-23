@@ -151,7 +151,11 @@ export default function Dashboard() {
                           </p>
                           <p style={{ paddingTop: "1.3rem" }}>{post.body}</p>
                           <div className={styles.singleCard__image}>
-                            <img src={`${BASE_URL}/${post.media}`} />
+                            {post.media !== "" ? (
+                              <img src={`${BASE_URL}/${post.media}`} />
+                            ) : (
+                              <></>
+                            )}
                           </div>
                           <div className={styles.optionsContainer}>
                             <div
@@ -250,14 +254,17 @@ export default function Dashboard() {
                 {postState.comments.length === 0 && <h2>No Comments</h2>}
                 {postState.comments.length !== 0 && (
                   <div>
-                    {postState.comments.map((comment, index) => {
+                    {postState.comments.map((postComment, index) => {
                       return (
-                        <div className={styles.singleComment} key={comment._id}>
+                        <div
+                          className={styles.singleComment}
+                          key={postComment._id}
+                        >
                           <div
                             className={styles.singleComment__profileContainer}
                           >
                             <img
-                              src={`${BASE_URL}/${comment.userId.profilePicture}`}
+                              src={`${BASE_URL}/${postComment.userId.profilePicture}`}
                               alt=""
                             />
                             <div>
@@ -267,11 +274,12 @@ export default function Dashboard() {
                                   fontSize: "1.2rem",
                                 }}
                               >
-                                {comment.userId.name}
+                                {postComment.userId.name}
                               </p>
-                              <p>@{comment.userId.username}</p>
+                              <p>@{postComment.userId.username}</p>
                             </div>
                           </div>
+                          <p>{postComment.body}</p>
                         </div>
                       );
                     })}

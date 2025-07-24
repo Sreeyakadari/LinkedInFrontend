@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import styles from "./index.module.css";
 import { useRouter } from "next/router";
 import { setTokenIsThere } from "@/config/redux/reducer/authReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-export default function DashboardLayout(children) {
+export default function DashboardLayout({ children }) {
   const router = useRouter();
+  const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {

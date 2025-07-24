@@ -1,13 +1,13 @@
 import { act } from "react";
 
-const {
+import {
   loginUser,
   registerUser,
   getAboutUser,
   getAllUsers,
   getConnectionsRequest,
   getMyConnectionRequests,
-} = require("../../action/authAction/index.js");
+} from "../../action/authAction/index.js";
 const { createSlice } = require("@reduxjs/toolkit");
 
 const initialState = {
@@ -102,7 +102,7 @@ const authSlice = createSlice({
       })
       .addCase(getMyConnectionRequests.rejected, (state, action) => {
         state.message = action.payload;
-      })
+      });
   },
 });
 

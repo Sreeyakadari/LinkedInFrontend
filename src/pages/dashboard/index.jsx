@@ -27,7 +27,7 @@ export default function Dashboard() {
       dispatch(getAboutUser({ token: localStorage.getItem("token") }));
     }
     if (!authState.all_profiles_fetched) {
-      dispatch(getAllUsers);
+      dispatch(getAllUsers());
     }
   }, [authState.isTokenThere]);
 
@@ -39,7 +39,7 @@ export default function Dashboard() {
     await dispatch(createPost({ file: fileContent, body: postContent }));
     setPostContent("");
     setFileContent(null);
-    dispatch(getAllPosts);
+    dispatch(getAllPosts());
   };
 
   //   useState(()=>{
@@ -85,7 +85,7 @@ export default function Dashboard() {
                   </div>
                 </label>
                 <input
-                  onChange={(e) => setFileContent(e.target.files(0))}
+                  onChange={(e) => setFileContent(e.target.files[0])}
                   type="file"
                   hidden
                   id="fileUpload"

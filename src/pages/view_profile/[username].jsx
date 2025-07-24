@@ -10,6 +10,7 @@ import { getAllPosts } from "@/config/redux/action/postAction";
 import {
   getConnectionsRequest,
   getMyConnectionRequests,
+  sendConnectionRequest,
 } from "@/config/redux/action/authAction";
 
 export default function ViewProfilePage({ userProfile }) {
@@ -19,7 +20,7 @@ export default function ViewProfilePage({ userProfile }) {
   const authState = useSelector((state) => state.auth);
   const [userPosts, setUserPosts] = useState([]);
   const [isCurrentUserInConnection, setIsCurrentUserInConnection] =
-    useState(false);
+    useState(true);
   const [isConnectionNull, setIsConnectionNull] = useState(true);
 
   const getUsersPost = async () => {
@@ -135,7 +136,7 @@ export default function ViewProfilePage({ userProfile }) {
                   <div
                     onClick={async () => {
                       const response = await clientServer.get(
-                        `/user/download_resume?id=${userProfile.userId_id}`
+                        `/user/download_resume?id=${userProfile.userId._id}`
                       );
                       window.open(
                         `${BASE_URL}/${response.data.message}`,
@@ -221,7 +222,7 @@ export default function ViewProfilePage({ userProfile }) {
 }
 
 export async function getServerSideProps(context) {
-  console.lof("From view");
+  console.log("From view");
   console.log(context.query.username);
 
   const request = await clientServer.get(

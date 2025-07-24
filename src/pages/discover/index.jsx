@@ -13,7 +13,7 @@ export default function Discoverpage() {
 
   useEffect(() => {
     if (!authState.all_profiles_fetched) {
-      dispatchEvent(getAllUsers());
+      dispatch(getAllUsers());
     }
   }, []);
 
@@ -25,12 +25,15 @@ export default function Discoverpage() {
         <h1>Discover</h1>
         <div className={styles.allUserProfile}>
           {authState.all_profiles_fetched &&
-            authState.all_userss.map((user) => {
+            authState.all_users.map((user) => {
               return (
-                <div onClick={()=>{
-                  router.push(`/view_profile/${user.userId.username}`)
-                }}
-                key={user._id} className={styles.userCard}>
+                <div
+                  onClick={() => {
+                    router.push(`/view_profile/${user.userId.username}`);
+                  }}
+                  key={user._id}
+                  className={styles.userCard}
+                >
                   <img
                     className={styles.userCard__image}
                     src={`${BASE_URL}/${user.userId.profilePicture}`}

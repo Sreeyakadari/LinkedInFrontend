@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./styles.module.css";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import { reset } from "@/config/redux/reducer/authReducer";
 
 export default function NavBarComponent() {
   const router = useRouter();
@@ -20,40 +21,40 @@ export default function NavBarComponent() {
           Pro Connect
         </h1>
         <div className={styles.navBarOptionContainer}>
-          {authState.profileFetched && (
-            <div>
-              <div style={{ display: "flex", gap: "1.2rem" }}>
-                {/* <p>Hey, {authState.user.userId.name}</p> */}
-                <p
-                  onClick={() => {
-                    router.push("/profile");
-                  }}
-                  style={{ fontWeight: "bold", cursor: "pointer" }}
-                >
-                  Profile
-                </p>
-                <p
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    router.push("/login");
-                    dispatch(reset());
-                  }}
-                  style={{ fontWeight: "bold", cursor: "pointer" }}
-                >
-                  Logout
-                </p>
+          {authState.isTokenThere ? (
+            <>
+              <p
+                onClick={() => router.push("/profile")}
+                className={styles.buttonSignIn}
+              >
+                Profile
+              </p>
+              <p
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  dispatch(reset());
+                  router.push("/login");
+                }}
+                className={styles.buttonJoin}
+              >
+                Logout
+              </p>
+            </>
+          ) : (
+            <>
+              <div
+                onClick={() => router.push("/login")}
+                className={styles.buttonSignIn}
+              >
+                <p>Sign in</p>
               </div>
-            </div>
-          )}
-          {!authState.profileFetched && (
-            <div
-              onClick={() => {
-                router.push("/login");
-              }}
-              className={styles.buttonJoin}
-            >
-              <p>Be a part</p>
-            </div>
+              <div
+                onClick={() => router.push("/login")}
+                className={styles.buttonJoin}
+              >
+                <p>Be a part</p>
+              </div>
+            </>
           )}
         </div>
       </nav>

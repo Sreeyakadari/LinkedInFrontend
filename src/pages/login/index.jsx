@@ -9,7 +9,7 @@ import { emptyMessage } from "@/config/redux/reducer/authReducer";
 function LoginComponent() {
   const authState = useSelector((state) => state.auth);
   const router = useRouter();
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
 
   const [userLoginMethod, setUserLoginMethod] = useState(false);
   const [email, setEmailAddress] = useState("");
@@ -23,24 +23,32 @@ function LoginComponent() {
     }
   }, [authState.loggedIn]);
 
-  useEffect(()=>{
-    if(localStorage.getItem("token")){
-      router.push("/dashboard")
+  // Only redirect if the app actually knows you're logged in
+  useEffect(() => {
+    if (authState.loggedIn) {
+      router.replace("/dashboard"); // replace avoids back button loop
     }
-  },[])
+  }, [authState.loggedIn]);
+
+  // (Optional, and safer)
+  useEffect(() => {
+    if (authState.isTokenThere && authState.profileFetched) {
+      router.replace("/dashboard");
+    }
+  }, [authState.isTokenThere, authState.profileFetched]);
 
   useEffect(() => {
-    dispath(emptyMessage)
-  }, [userLoginMethod]);
+    dispatch(emptyMessage());
+  }, [userLoginMethod,dispatch]);
 
   const handleRegister = () => {
     console.log("registering");
-    dispath(registerUser({ username, password, email, name }));
+    dispatch(registerUser({ username, password, email, name }));
   };
 
   const handleLogin = () => {
     console.log("Login");
-    dispath(loginUser({email,password}))
+    dispatch(loginUser({ email, password }));
   };
 
   return (
@@ -80,7 +88,7 @@ function LoginComponent() {
               <input
                 onChange={(e) => setPassword(e.target.value)}
                 className={styles.inputField}
-                type="text"
+                type="password"
                 placeholder="Password"
               ></input>
               <div

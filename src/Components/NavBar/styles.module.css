@@ -22,3 +22,23 @@
   cursor: pointer;
   font-weight: bold;
 }
+
+.navBarOptionContainer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.buttonSignIn {
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.buttonSignIn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+

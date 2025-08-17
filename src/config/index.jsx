@@ -9,7 +9,7 @@ const TOKEN_STORAGE_KEY = "token";
 
 export const clientServer = axios.create({
   baseURL: BASE_URL,
-  withCredentials: false,
+  withCredentials: true,
 });
 
 // Add Authorization header automatically

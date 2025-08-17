@@ -5,7 +5,9 @@ export const getAllPosts = createAsyncThunk(
   "post/getAllPosts",
   async (_, thunkAPI) => {
     try {
-      const response = await clientServer.get("/posts");
+      const response = await clientServer.get("/posts", {
+        withCredentials: true, // ✅ Added
+      });
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -27,6 +29,7 @@ export const createPost = createAsyncThunk(
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        withCredentials: true, // ✅ Added
       });
 
       if (response.status === 200) {
@@ -49,6 +52,7 @@ export const deletePost = createAsyncThunk(
           token: localStorage.getItem("token"),
           post_id: post_id.post_id,
         },
+        withCredentials: true, // ✅ Added
       });
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
@@ -59,54 +63,62 @@ export const deletePost = createAsyncThunk(
 
 export const incrementPostLike = createAsyncThunk(
   "post/incrementLike",
-
-  async (post,thunkAPI)=>{
-    try{
-      const response =await clientServer.post(`/increment_post_like`,{
-        post_id:post.post_id
-      })
-      return thunkAPI.fulfillWithValue(response.data)
-    }catch(error){
-      return thunkAPI.rejectWithValue(error.response.data.message)
-    }
-  }
-)
-
-export const getAllComments = createAsyncThunk(
-  "post/getAllComments",
-  async(postData,thunkAPI)=>{
-    try{
-      const response = await clientServer.get("/get_comments",{
-        params:{
-          post_id:postData.post_id
-        }
-      })
-      return thunkAPI.fulfillWithValue({
-        comments:response.data,
-        post_id:postData.post_id
-      })
-    }catch(error){
+  async (post, thunkAPI) => {
+    try {
+      const response = await clientServer.post(
+        `/increment_post_like`,
+        {
+          post_id: post.post_id,
+        },
+        { withCredentials: true } // ✅ Added
+      );
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data.message);
     }
   }
-)
+);
 
-export const postComment=createAsyncThunk(
+export const getAllComments = createAsyncThunk(
+  "post/getAllComments",
+  async (postData, thunkAPI) => {
+    try {
+      const response = await clientServer.get("/get_comments", {
+        params: {
+          post_id: postData.post_id,
+        },
+        withCredentials: true, // ✅ Added
+      });
+      return thunkAPI.fulfillWithValue({
+        comments: response.data,
+        post_id: postData.post_id,
+      });
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const postComment = createAsyncThunk(
   "post/postComment",
-  async(commentData,thunkAPI)=>{
-    try{
+  async (commentData, thunkAPI) => {
+    try {
       console.log({
-        post_id:commentData.post_id,
-        body:commentData.body
-      })
-      const response = await clientServer.post("/comment",{
-        token:localStorage.getItem("token"),
-        post_id:commentData.post_id,
-        commentBody:commentData.body
-      })
-      return thunkAPI.fulfillWithValue(response.data)
-    }catch(error){
+        post_id: commentData.post_id,
+        body: commentData.body,
+      });
+      const response = await clientServer.post(
+        "/comment",
+        {
+          token: localStorage.getItem("token"),
+          post_id: commentData.post_id,
+          commentBody: commentData.body,
+        },
+        { withCredentials: true } // ✅ Added
+      );
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
       return thunkAPI.rejectWithValue("Something went wrong");
     }
   }
-)
+);

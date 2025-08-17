@@ -5,10 +5,14 @@ export const loginUser = createAsyncThunk(
   "user/login",
   async (user, thunkAPI) => {
     try {
-      const { data } = await clientServer.post("/login", {
-        email: user.email,
-        password: user.password,
-      });
+      const { data } = await clientServer.post(
+        "/login",
+        {
+          email: user.email,
+          password: user.password,
+        },
+        { withCredentials: true } // ✅ Added
+      );
 
       const token = data?.token;
       const userObj = data?.user || {};
@@ -39,12 +43,16 @@ export const registerUser = createAsyncThunk(
   "user/register",
   async (user, thunkAPI) => {
     try {
-      await clientServer.post("/register", {
-        username: user.username,
-        password: user.password,
-        email: user.email,
-        name: user.name,
-      });
+      await clientServer.post(
+        "/register",
+        {
+          username: user.username,
+          password: user.password,
+          email: user.email,
+          name: user.name,
+        },
+        { withCredentials: true } // ✅ Added
+      );
       return true;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -71,6 +79,7 @@ export const getAboutUser = createAsyncThunk(
 
       const { data } = await clientServer.get("/get_user_and_profile", {
         params: { userId: _userId },
+        withCredentials: true, // ✅ Added
       });
 
       return data;
@@ -88,7 +97,9 @@ export const getAllUsers = createAsyncThunk(
   "user/getAllUsers",
   async (_, thunkAPI) => {
     try {
-      const { data } = await clientServer.get("/user/get_all_users");
+      const { data } = await clientServer.get("/user/get_all_users", {
+        withCredentials: true, // ✅ Added
+      });
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -107,7 +118,8 @@ export const sendConnectionRequest = createAsyncThunk(
         {
           token: user.token,
           connectionId: user.user_id,
-        }
+        },
+        { withCredentials: true } // ✅ Added
       );
       thunkAPI.dispatch(getConnectionsRequest({ token: user.token }));
       return data;
@@ -125,6 +137,7 @@ export const getConnectionsRequest = createAsyncThunk(
     try {
       const { data } = await clientServer.get("/user/getConnectionRequests", {
         params: { token: user.token },
+        withCredentials: true, // ✅ Added
       });
       return data.connections;
     } catch (error) {
@@ -141,6 +154,7 @@ export const getMyConnectionRequests = createAsyncThunk(
     try {
       const { data } = await clientServer.get("/user/user_connection_request", {
         params: { token: user.token },
+        withCredentials: true, // ✅ Added
       });
       return data;
     } catch (error) {
@@ -161,7 +175,8 @@ export const AcceptConnection = createAsyncThunk(
           token: user.token,
           requestId: user.connectionId,
           action_type: user.action,
-        }
+        },
+        { withCredentials: true } // ✅ Added
       );
       thunkAPI.dispatch(getConnectionsRequest({ token: user.token }));
       thunkAPI.dispatch(getMyConnectionRequests({ token: user.token }));

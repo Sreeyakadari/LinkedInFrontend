@@ -1,205 +1,259 @@
 .container {
-  padding: 2rem;
+  margin-top: 20px;
+  display: flex;
+  min-height: 100vh;
 }
+
+.sidebar {
+  width: 220px;
+  background-color: #f5f5f5;
+  padding: 1rem 1rem 1rem 0; /* Removed left padding */
+  margin-left: 0; /* Remove left margin */
+}
+
+.sidebar h2 {
+  margin-bottom: 1rem;
+  padding-left: 1rem; /* Add padding left so text aligns nicely */
+}
+
+.sidebar a {
+  text-decoration: none; /* Removes underline */
+  color: inherit; /* Optional: keeps default text color */
+}
+
+.sidebar ul {
+  list-style: none;
+  padding-left: 1rem; /* align list text nicely */
+}
+
+.sidebar li {
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
+/* Hide the posts column completely */
+.rightCol {
+  display: none;
+}
+
+.main {
+  flex: 1;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+.topRight {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profileLink {
+  font-weight: 600;
+  cursor: default;
+}
+
+/* Added margin-left to push logout button only */
+.logoutBtn {
+  background-color: #ff4d4d;
+  border: none;
+  padding: 0.4rem 1rem;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 1rem; /* margin only here */
+}
+
+.coverWrap {
+  position: relative;
+}
+
+.cover {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.avatarWrap {
+  position: absolute;
+  bottom: -45px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10; /* Ensure it's above cover */
+  border-radius: 50%;
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid white;
+  object-fit: cover;
+  box-sizing: content-box; /* ensure border doesn't clip */
+}
+
+/* Removed avatarEdit class - no edit button near avatar */
 
 .profileLayout {
   display: flex;
+  margin-top: 60px;
   gap: 2rem;
-  margin-top: 1.5rem;
 }
 
 .leftCol {
-  flex: 0.6;
-}
-
-.rightCol {
-  flex: 0.4;
-}
-
-.backDropContainer {
-  position: relative;
-  width: 150px;
-  height: 150px;
-}
-
-.backDropContainer img {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.backDrop__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.backDropContainer:hover .backDrop__overlay {
-  opacity: 1;
+  flex: 1;
 }
 
 .nameRow {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
-.username {
-  color: gray;
-  font-size: 1rem;
+.nameRow h2 {
+  margin: 0;
 }
 
-.inputEdit {
-  border: 1px solid #ccc;
-  padding: 4px 8px;
-  font-size: 1rem;
-  border-radius: 4px;
+.username {
+  color: #777;
 }
 
 .icon {
-  color: #666;
   cursor: pointer;
+  color: #666;
+  font-size: 14px;
+  user-select: none;
 }
 
-.icon:hover {
-  color: #000;
-}
-
-.bioSection {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+.inputEdit {
+  padding: 6px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 .textareaEdit {
   width: 100%;
-  min-height: 60px;
-  border: 1px solid #ccc;
   border-radius: 4px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 14px;
   padding: 6px;
 }
 
-.workHistory {
-  margin-top: 2rem;
+.bioSection {
+  margin-top: 1rem;
+  position: relative;
 }
 
-.workHistoryList {
+.workHistory {
+  margin-top: 1.5rem;
+}
+
+.workList {
+  margin-top: 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  max-width: 90%;
+  gap: 0.75rem;
 }
 
 .workCard {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  background: #f4f4f4;
-  padding: 0.6rem;
+  background: #eee;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
+  align-items: center;
 }
 
 .workTitle {
-  font-weight: bold;
+  font-weight: 600;
+  margin: 0;
+}
+
+.workYears {
+  font-size: 12px;
+  color: #555;
 }
 
 .deleteIcon {
-  color: #b33;
   cursor: pointer;
+  color: #a00;
+  font-size: 14px;
 }
 
+/* Make Add Work button small and fit content */
 .addWorkBtn {
-  margin-top: 0.6rem;
+  margin-top: 0.5rem;
   padding: 0.4rem 0.8rem;
-  background: #0073b1;
-  color: white;
   border: none;
+  background-color: #0070f3;
+  color: white;
   border-radius: 4px;
-  font-size: 0.85rem;
   cursor: pointer;
-}
-
-.addWorkBtn:hover {
-  background: #005f8d;
+  font-weight: 600;
+  width: fit-content; /* smaller button */
 }
 
 .updateProfileBtn {
   margin-top: 1rem;
-  padding: 0.6rem;
-  background: #0073b1;
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #00a86b;
   color: white;
   border-radius: 6px;
-  text-align: center;
   cursor: pointer;
+  font-weight: 600;
 }
 
-.updateProfileBtn:hover {
-  background: #005f8d;
-}
-
-.postCard {
-  background: #f9f9f9;
-  padding: 0.6rem;
-  border-radius: 6px;
-  margin-bottom: 0.6rem;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.postImage {
-  width: 3rem;
-  height: 3rem;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
+/* Modal styles */
 .modalBackdrop {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
-.modalBox {
+.modalContent {
   background: white;
-  padding: 1rem;
-  border-radius: 6px;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.inputField {
-  padding: 0.4rem;
-  border: 1px solid #ddd;
+.modalContent input {
+  padding: 8px;
+  font-size: 14px;
   border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
-.addWorkConfirm {
-  padding: 0.4rem;
-  background: #0073b1;
+.modalContent button {
+  padding: 8px;
+  border: none;
+  background-color: #0070f3;
   color: white;
-  text-align: center;
-  border-radius: 4px;
   cursor: pointer;
+  border-radius: 4px;
+  font-weight: 600;
+  user-select: none;
 }
 
-.addWorkConfirm:hover {
-  background: #005f8d;
+.modalContent button:last-child {
+  background-color: #888;
 }

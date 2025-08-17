@@ -1,30 +1,28 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { BASE_URL } from "@/config";
+import UserLayout from "@/layout/UserLayout";
+import DashboardLayout from "@/layout/DashboardLayout";
+
+import { FiPlus, FiSend, FiX } from "react-icons/fi";
 import {
-  FaPlus,
-  FaPaperPlane,
-  FaTimes,
-  FaHeart,
-  FaRegCommentDots,
-  FaShareAlt,
-} from "react-icons/fa";
+  AiOutlineLike,
+  AiFillLike,
+  AiOutlineComment,
+  AiOutlineShareAlt,
+} from "react-icons/ai";
+
 import styles from "./index.module.css";
 
-// Mock current user - in a real app this would come from auth context/redux
-const mockUser = {
-  id: "1",
-  name: "Apna College 2",
-  username: "apnacollege",
-  profilePicture:
-    "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400",
-};
+export default function DashboardPage() {
+  const { user } = useSelector((s) => s.auth || {});
 
-export default function SocialDashboard() {
+  // ✅ Always resolve user avatar or fallback
   const avatar = useMemo(() => {
-    return (
-      mockUser?.profilePicture ||
-      "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=400"
-    );
-  }, []);
+    return user?.profilePicture
+      ? `${BASE_URL}/${user.profilePicture}`
+      : `${BASE_URL}/uploads/default.jpg`; // ✅ FIXED fallback path
+  }, [user]);
 
   const [text, setText] = useState("");
   const [preview, setPreview] = useState(null);
@@ -36,22 +34,12 @@ export default function SocialDashboard() {
       id: 1,
       name: "Apna College 2",
       username: "@apnacollege",
-      avatar:
-        "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400",
-      body: "Hello World! Welcome to our social platform. Share your thoughts and connect with others.",
-      image:
-        "https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=800",
-      likes: 5,
+      avatar: `${BASE_URL}/uploads/default.jpg`, // ✅ FIXED here too
+      body: "Hello World",
+      image: "/sample-post.png",
+      likes: 0,
       likedByMe: false,
-      comments: [
-        {
-          id: "1-1",
-          body: "Great to see this platform growing!",
-          author: "User 1",
-          avatar:
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=400",
-        },
-      ],
+      comments: [],
     },
   ]);
 
@@ -76,11 +64,11 @@ export default function SocialDashboard() {
 
     const newPost = {
       id: Date.now(),
-      name: mockUser?.name || "You",
-      username: `@${mockUser?.username || "you"}`,
+      name: user?.name || "You",
+      username: `@${user?.username || "you"}`,
       avatar,
       body: text.trim(),
-      image: preview || undefined,
+      image: preview || null,
       likes: 0,
       likedByMe: false,
       comments: [],
@@ -115,7 +103,7 @@ export default function SocialDashboard() {
                 {
                   id: `${id}-${Date.now()}`,
                   body: msg.trim(),
-                  author: mockUser?.name || "You",
+                  author: user?.name || "You",
                   avatar,
                 },
               ],
@@ -134,97 +122,99 @@ export default function SocialDashboard() {
         await navigator.clipboard.writeText(shareText);
         alert("Post copied to clipboard!");
       }
-    } catch (e) {
-      console.log("Share failed");
-    }
+    } catch (e) {}
   };
 
   return (
-    <div className={styles.dashboard}>
-      <div className={styles.feed}>
-        {/* Composer */}
-        <div className={styles.composer}>
-          <img src={avatar} alt="Your profile" className={styles.avatar} />
-          <div className={styles.composerMain}>
-            <textarea
-              className={styles.input}
-              placeholder="What's on your mind?"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              rows={1}
-            />
-            {preview && (
-              <div className={styles.preview}>
-                <img src={preview} alt="preview" />
+    <UserLayout>
+      <DashboardLayout>
+        <div className={styles.feed}>
+          {/* Composer */}
+          <div className={styles.composer}>
+            <img src={avatar} alt="me" className={styles.avatar} />
+            <div className={styles.composerMain}>
+              <textarea
+                className={styles.input}
+                placeholder="What's on your mind?"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                rows={1}
+              />
+              {preview && (
+                <div className={styles.preview}>
+                  <img src={preview} alt="preview" />
+                  <button
+                    className={styles.previewClose}
+                    onClick={() => {
+                      setPreview(null);
+                      setFile(null);
+                      if (imageInputRef.current)
+                        imageInputRef.current.value = "";
+                    }}
+                  >
+                    <FiX />
+                  </button>
+                </div>
+              )}
+              <div className={styles.composerActions}>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={onPickImage}
+                />
                 <button
-                  className={styles.previewClose}
-                  onClick={() => {
-                    setPreview(null);
-                    setFile(null);
-                    if (imageInputRef.current) imageInputRef.current.value = "";
-                  }}
+                  className={styles.circleBtn}
+                  onClick={() => imageInputRef.current?.click()}
+                  title="Add image"
                 >
-                  <FaTimes size={16} />
+                  <FiPlus size={18} />
+                </button>
+                <button
+                  className={styles.sendBtn}
+                  onClick={onSendPost}
+                  disabled={!text.trim() && !preview}
+                  title="Send post"
+                >
+                  <FiSend size={18} />
                 </button>
               </div>
-            )}
-            <div className={styles.composerActions}>
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={onPickImage}
-              />
-              <button
-                className={styles.circleBtn}
-                onClick={() => imageInputRef.current?.click()}
-                title="Add image"
-              >
-                <FaPlus size={18} />
-              </button>
-              <button
-                className={styles.sendBtn}
-                onClick={onSendPost}
-                disabled={!text.trim() && !preview}
-                title="Send post"
-              >
-                <FaPaperPlane size={18} />
-              </button>
             </div>
           </div>
-        </div>
 
-        {/* Feed */}
-        <div className={styles.list}>
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onLike={() => toggleLike(post.id)}
-              onShare={() => sharePost(post)}
-              onComment={(msg) => addComment(post.id, msg)}
-              currentUserAvatar={avatar}
-            />
-          ))}
+          {/* Feed */}
+          <div className={styles.list}>
+            {posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                onLike={() => toggleLike(post.id)}
+                onShare={() => sharePost(post)}
+                onComment={(msg) => addComment(post.id, msg)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+      </DashboardLayout>
+    </UserLayout>
   );
 }
 
-function PostCard({ post, onLike, onShare, onComment, currentUserAvatar }) {
+function PostCard({ post, onLike, onShare, onComment }) {
   const [comment, setComment] = useState("");
+  const likeIcon = post.likedByMe ? (
+    <AiFillLike size={18} />
+  ) : (
+    <AiOutlineLike size={18} />
+  );
 
   return (
     <article className={styles.card}>
       <header className={styles.cardHeader}>
         <img
-          src={
-            post.avatar ||
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=400"
-          }
-          alt={post.name}
+          src={post.avatar || `${BASE_URL}/uploads/default.jpg`} // ✅ fallback
+          alt=""
           className={styles.avatar}
         />
         <div>
@@ -244,23 +234,18 @@ function PostCard({ post, onLike, onShare, onComment, currentUserAvatar }) {
       )}
 
       <div className={styles.actions}>
-        <button
-          className={`${styles.actionBtn} ${
-            post.likedByMe ? styles.liked : ""
-          }`}
-          onClick={onLike}
-        >
-          <FaHeart color={post.likedByMe ? "#ef4444" : "black"} />
+        <button className={styles.actionBtn} onClick={onLike}>
+          {likeIcon}
           <span>{post.likes}</span>
         </button>
 
         <span className={styles.actionBtnStatic}>
-          <FaRegCommentDots size={18} />
+          <AiOutlineComment size={18} />
           <span>{post.comments.length}</span>
         </span>
 
         <button className={styles.actionBtn} onClick={onShare}>
-          <FaShareAlt size={18} />
+          <AiOutlineShareAlt size={18} />
           <span>Share</span>
         </button>
       </div>
@@ -270,8 +255,8 @@ function PostCard({ post, onLike, onShare, onComment, currentUserAvatar }) {
           {post.comments.map((c) => (
             <div key={c.id} className={styles.commentItem}>
               <img
-                src={c.avatar}
-                alt={c.author}
+                src={c.avatar || `${BASE_URL}/uploads/default.jpg`} // ✅ fallback
+                alt=""
                 className={styles.commentAvatar}
               />
               <div className={styles.commentBubble}>
@@ -286,11 +271,6 @@ function PostCard({ post, onLike, onShare, onComment, currentUserAvatar }) {
       )}
 
       <div className={styles.commentComposer}>
-        <img
-          src={currentUserAvatar}
-          alt="Your profile"
-          className={styles.commentAvatar}
-        />
         <input
           className={styles.commentInput}
           value={comment}
@@ -315,7 +295,7 @@ function PostCard({ post, onLike, onShare, onComment, currentUserAvatar }) {
             }
           }}
         >
-          <FaPaperPlane size={16} />
+          <FiSend size={16} />
         </button>
       </div>
     </article>

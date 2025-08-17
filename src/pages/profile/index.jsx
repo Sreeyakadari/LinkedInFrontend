@@ -1,19 +1,21 @@
-import { getAboutUser } from "@/config/redux/action/authAction";
-import DashboardLayout from "@/layout/DashboardLayout";
-import UserLayout from "@/layout/UserLayout";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAboutUser, logoutUser } from "@/config/redux/action/authAction";
+import { getAllPosts } from "@/config/redux/action/postAction";
+import { useRouter } from "next/router";
 import styles from "./index.module.css";
 import { BASE_URL, clientServer } from "@/config";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllPosts } from "@/config/redux/action/postAction";
 import { FaPen, FaTrash } from "react-icons/fa";
+import Link from "next/link"; // ✅ added Link import
 
-export default function ProfilePage() {
-  const authState = useSelector((state) => state.auth);
-  const postReducer = useSelector((state) => state.postReducer);
+const Profile = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { token, user, isLoading } = useSelector((state) => state.auth);
+  const { posts } = useSelector((state) => state.postReducer);
+
   const [userProfile, setUserProfile] = useState({});
   const [userPosts, setUserPosts] = useState([]);
-  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputData, setInputData] = useState({
     company: "",
@@ -23,54 +25,84 @@ export default function ProfilePage() {
   const [editingField, setEditingField] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
 
-  const handleWorkInputChange = (e) => {
-    const { name, value } = e.target;
-    setInputData({ ...inputData, [name]: value });
-  };
+  useEffect(() => {
+    if (!token) {
+      router.replace("/login");
+    } else {
+      dispatch(getAboutUser({ token }));
+      dispatch(getAllPosts());
+    }
+  }, [dispatch, token, router]);
 
   useEffect(() => {
-    dispatch(getAboutUser({ token: localStorage.getItem("token") }));
-    dispatch(getAllPosts());
-  }, [dispatch]);
+    if (user) {
+      setUserProfile(user);
+    }
+  }, [user]);
 
   useEffect(() => {
-    if (authState.user) {
-      setUserProfile(authState.user);
-      const myPosts = (postReducer.posts || []).filter(
-        (p) => p?.userId?.username === authState.user?.userId?.username
+    if (userProfile && user) {
+      const changed =
+        userProfile.name !== user.name ||
+        userProfile.username !== user.username ||
+        userProfile.bio !== user.bio ||
+        JSON.stringify(userProfile.pastWork) !== JSON.stringify(user.pastWork);
+
+      setHasChanges(changed);
+    }
+  }, [userProfile, user]);
+
+  useEffect(() => {
+    if (user) {
+      const myPosts = (posts || []).filter(
+        (p) => p?.userId?.username === user?.username
       );
       setUserPosts(myPosts);
     }
-  }, [authState.user, postReducer.posts]);
+  }, [user, posts]);
 
-  const updateProfilePictue = async (file) => {
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    router.replace("/login");
+  };
+
+  const updateProfilePicture = async (file) => {
+    if (!file) return;
     const formData = new FormData();
     formData.append("profile_picture", file);
-    formData.append("token", localStorage.getItem("token"));
+    formData.append("token", token);
 
-    await clientServer.post("/update_profile_picture", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    dispatch(getAboutUser({ token: localStorage.getItem("token") }));
+    try {
+      await clientServer.post("/update_profile_picture", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      dispatch(getAboutUser({ token }));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const updateProfileData = async () => {
-    await clientServer.post("/user_update", {
-      token: localStorage.getItem("token"),
-      name: userProfile.userId.name,
-      username: userProfile.userId.username,
-    });
+    try {
+      await clientServer.post("/user_update", {
+        token,
+        name: userProfile.name,
+        username: userProfile.username,
+      });
 
-    await clientServer.post("/update_profile_data", {
-      token: localStorage.getItem("token"),
-      bio: userProfile.bio,
-      currentPost: userProfile.currentPost,
-      pastWork: userProfile.pastWork,
-      education: userProfile.education,
-    });
+      await clientServer.post("/update_profile_data", {
+        token,
+        bio: userProfile.bio,
+        currentPost: userProfile.currentPost,
+        pastWork: userProfile.pastWork,
+        education: userProfile.education,
+      });
 
-    setHasChanges(false);
-    dispatch(getAboutUser({ token: localStorage.getItem("token") }));
+      setHasChanges(false);
+      dispatch(getAboutUser({ token }));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const deleteWorkEntry = (index) => {
@@ -79,224 +111,241 @@ export default function ProfilePage() {
     setUserProfile({ ...userProfile, pastWork: updatedWork });
   };
 
+  const handleWorkInputChange = (e) => {
+    const { name, value } = e.target;
+    setInputData({ ...inputData, [name]: value });
+  };
+
+  if (isLoading || !userProfile?.username)
+    return <p className={styles.loading}>Loading profile...</p>;
+
   return (
-    <UserLayout>
-      <DashboardLayout>
-        {authState.user?.userId ? (
-          <div className={styles.container}>
-            {/* Profile Picture */}
-            <div className={styles.backDropContainer}>
-              <label
-                htmlFor="profilePictureUpload"
-                className={styles.backDrop__overlay}
-              >
-                <p>Edit</p>
-              </label>
-              <input
-                onChange={(e) => updateProfilePictue(e.target.files[0])}
-                hidden
-                type="file"
-                id="profilePictureUpload"
+    <div className={styles.container}>
+      <aside className={styles.sidebar}>
+        <h2>Pro Connect</h2>
+        <ul>
+          <li>
+            <Link href="/dashboard">🏠&nbsp;Scroll</Link>
+          </li>
+          <li>
+            <Link href="/discover">🔍&nbsp;Discover</Link>
+          </li>
+          <li>
+            <Link href="/my_connections">👥&nbsp;My Connections</Link>
+          </li>
+        </ul>
+      </aside>
+
+      <main className={styles.main}>
+        <div className={styles.topRight}>
+          <span className={styles.profileLink}>Profile</span>
+          <button className={styles.logoutBtn} onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+
+        <div className={styles.coverWrap}>
+          <img
+            className={styles.cover}
+            src="https://images.unsplash.com/photo-1501973801540-537f08ccae7b?q=80&w=2000&auto=format&fit=crop"
+            alt="cover"
+          />
+          <div className={styles.avatarWrap}>
+            <img
+              className={styles.avatar}
+              src={
+                userProfile?.profilePicture
+                  ? `${BASE_URL}/${userProfile.profilePicture}`
+                  : `${BASE_URL}/uploads/default.jpg`
+              }
+              alt="profile"
+            />
+            <input
+              id="avatarUpload"
+              hidden
+              type="file"
+              accept="image/*"
+              onChange={(e) => updateProfilePicture(e.target.files?.[0])}
+            />
+          </div>
+        </div>
+
+        <div className={styles.profileLayout}>
+          <section className={styles.leftCol}>
+            <div className={styles.nameRow}>
+              {editingField === "name" ? (
+                <input
+                  className={styles.inputEdit}
+                  type="text"
+                  value={userProfile?.name || ""}
+                  onChange={(e) =>
+                    setUserProfile({ ...userProfile, name: e.target.value })
+                  }
+                  onBlur={() => setEditingField(null)}
+                  autoFocus
+                />
+              ) : (
+                <h2>{userProfile?.name || ""}</h2>
+              )}
+              <FaPen
+                className={styles.icon}
+                onClick={() => setEditingField("name")}
               />
-              <img
-                src={
-                  userProfile?.userId?.profilePicture
-                    ? `${BASE_URL}/${userProfile.userId.profilePicture}`
-                    : "/default-profile.png"
-                }
-                alt="Profile"
+
+              {editingField === "username" ? (
+                <input
+                  className={styles.inputEdit}
+                  type="text"
+                  value={userProfile?.username || ""}
+                  onChange={(e) =>
+                    setUserProfile({
+                      ...userProfile,
+                      username: e.target.value,
+                    })
+                  }
+                  onBlur={() => setEditingField(null)}
+                  autoFocus
+                />
+              ) : (
+                <span className={styles.username}>
+                  @{userProfile?.username || ""}
+                </span>
+              )}
+              <FaPen
+                className={styles.icon}
+                onClick={() => setEditingField("username")}
               />
             </div>
 
-            {/* Two-column layout */}
-            <div className={styles.profileLayout}>
-              {/* Left Column */}
-              <div className={styles.leftCol}>
-                {/* Name + Username Row */}
-                <div className={styles.nameRow}>
-                  {editingField === "name" ? (
-                    <input
-                      className={styles.inputEdit}
-                      type="text"
-                      value={userProfile?.userId?.name || ""}
-                      onChange={(e) => {
-                        setUserProfile({
-                          ...userProfile,
-                          userId: {
-                            ...userProfile.userId,
-                            name: e.target.value,
-                          },
-                        });
-                        setHasChanges(true);
-                      }}
-                      onBlur={() => setEditingField(null)}
-                    />
-                  ) : (
-                    <h2>{userProfile?.userId?.name || ""}</h2>
-                  )}
+            <div className={styles.bioSection}>
+              {editingField === "bio" ? (
+                <textarea
+                  className={styles.textareaEdit}
+                  value={userProfile?.bio || ""}
+                  onChange={(e) =>
+                    setUserProfile({ ...userProfile, bio: e.target.value })
+                  }
+                  onBlur={() => setEditingField(null)}
+                  rows={3}
+                  autoFocus
+                />
+              ) : (
+                <>
+                  <p>{userProfile?.bio || "No bio available"}</p>
                   <FaPen
                     className={styles.icon}
-                    onClick={() => setEditingField("name")}
+                    onClick={() => setEditingField("bio")}
                   />
+                </>
+              )}
+            </div>
 
-                  {editingField === "username" ? (
-                    <input
-                      className={styles.inputEdit}
-                      type="text"
-                      value={userProfile?.userId?.username || ""}
-                      onChange={(e) => {
-                        setUserProfile({
-                          ...userProfile,
-                          userId: {
-                            ...userProfile.userId,
-                            username: e.target.value,
-                          },
-                        });
-                        setHasChanges(true);
-                      }}
-                      onBlur={() => setEditingField(null)}
+            <div className={styles.workHistory}>
+              <h4>Work History</h4>
+              <div className={styles.workList}>
+                {(userProfile.pastWork || []).map((work, index) => (
+                  <div key={index} className={styles.workCard}>
+                    <div>
+                      <p className={styles.workTitle}>
+                        {work?.company || "-"}&nbsp;—&nbsp;
+                        {work?.position || "-"}
+                      </p>
+                      {work?.years ? (
+                        <span className={styles.workYears}>
+                          {work.years} yrs
+                        </span>
+                      ) : null}
+                    </div>
+                    <FaTrash
+                      className={styles.deleteIcon}
+                      onClick={() => deleteWorkEntry(index)}
                     />
-                  ) : (
-                    <span className={styles.username}>
-                      @{userProfile?.userId?.username || ""}
-                    </span>
-                  )}
-                  <FaPen
-                    className={styles.icon}
-                    onClick={() => setEditingField("username")}
-                  />
-                </div>
-
-                {/* Bio */}
-                <div className={styles.bioSection}>
-                  {editingField === "bio" ? (
-                    <textarea
-                      className={styles.textareaEdit}
-                      value={userProfile.bio || ""}
-                      onChange={(e) => {
-                        setUserProfile({ ...userProfile, bio: e.target.value });
-                        setHasChanges(true);
-                      }}
-                      onBlur={() => setEditingField(null)}
-                    />
-                  ) : (
-                    <>
-                      <p>{userProfile.bio || "No bio available"}</p>
-                      <FaPen
-                        className={styles.icon}
-                        onClick={() => setEditingField("bio")}
-                      />
-                    </>
-                  )}
-                </div>
-
-                {/* Work History */}
-                <div className={styles.workHistory}>
-                  <h4>Work History</h4>
-                  <div className={styles.workHistoryList}>
-                    {(userProfile.pastWork || []).map((work, index) => (
-                      <div key={index} className={styles.workCard}>
-                        <div>
-                          <p className={styles.workTitle}>
-                            {work.company} - {work.position}
-                          </p>
-                          <p>{work.years}</p>
-                        </div>
-                        <FaTrash
-                          className={styles.deleteIcon}
-                          onClick={() => deleteWorkEntry(index)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    className={styles.addWorkBtn}
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    Add Work
-                  </button>
-                </div>
-
-                {/* Show Update Profile only if text fields change */}
-                {hasChanges && (
-                  <div
-                    onClick={updateProfileData}
-                    className={styles.updateProfileBtn}
-                  >
-                    Update Profile
-                  </div>
-                )}
-              </div>
-
-              {/* Right Column - Recent Activity */}
-              <div className={styles.rightCol}>
-                <h3>Recent Activity</h3>
-                {userPosts.map((post) => (
-                  <div key={post._id} className={styles.postCard}>
-                    {post.media !== "" && (
-                      <img
-                        src={`${BASE_URL}/${post.media}`}
-                        alt="post"
-                        className={styles.postImage}
-                      />
-                    )}
-                    <p>{post.body}</p>
                   </div>
                 ))}
+                <button
+                  className={styles.addWorkBtn}
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  + Add Work
+                </button>
               </div>
             </div>
-          </div>
-        ) : (
-          <div style={{ padding: "2rem" }}>Loading your profile…</div>
-        )}
 
-        {/* Modal */}
+            {hasChanges && (
+              <button
+                className={styles.updateProfileBtn}
+                onClick={updateProfileData}
+              >
+                Update Profile
+              </button>
+            )}
+          </section>
+
+          <section className={styles.rightCol}>
+            {/* Hidden on purpose per your request */}
+          </section>
+        </div>
+
         {isModalOpen && (
           <div
-            onClick={() => setIsModalOpen(false)}
             className={styles.modalBackdrop}
+            onClick={() => setIsModalOpen(false)}
           >
             <div
+              className={styles.modalContent}
               onClick={(e) => e.stopPropagation()}
-              className={styles.modalBox}
             >
+              <h3>Add Work History</h3>
               <input
-                onChange={handleWorkInputChange}
+                type="text"
                 name="company"
-                className={styles.inputField}
-                type="text"
-                placeholder="Company name"
+                placeholder="Company"
+                value={inputData.company}
+                onChange={handleWorkInputChange}
               />
               <input
-                onChange={handleWorkInputChange}
+                type="text"
                 name="position"
-                className={styles.inputField}
-                type="text"
-                placeholder="Role"
+                placeholder="Position"
+                value={inputData.position}
+                onChange={handleWorkInputChange}
               />
               <input
-                onChange={handleWorkInputChange}
-                name="years"
-                className={styles.inputField}
                 type="number"
-                placeholder="Years of Experience"
+                name="years"
+                placeholder="Years"
+                value={inputData.years}
+                onChange={handleWorkInputChange}
+                min="0"
               />
-              <div
+              <button
                 onClick={() => {
-                  setUserProfile({
-                    ...userProfile,
-                    pastWork: [...(userProfile.pastWork || []), inputData],
-                  });
-                  setIsModalOpen(false);
+                  if (
+                    inputData.company.trim() &&
+                    inputData.position.trim() &&
+                    inputData.years.trim()
+                  ) {
+                    const newPastWork = [
+                      ...(userProfile.pastWork || []),
+                      inputData,
+                    ];
+                    setUserProfile({ ...userProfile, pastWork: newPastWork });
+                    setInputData({ company: "", position: "", years: "" });
+                    setIsModalOpen(false);
+                  } else {
+                    alert("Please fill all fields");
+                  }
                 }}
-                className={styles.addWorkConfirm}
               >
-                Add Work
-              </div>
+                Add
+              </button>
+              <button onClick={() => setIsModalOpen(false)}>Cancel</button>
             </div>
           </div>
         )}
-      </DashboardLayout>
-    </UserLayout>
+      </main>
+    </div>
   );
-}
+};
+
+export default Profile;

@@ -6,10 +6,9 @@ import {
 import DashboardLayout from "@/layout/DashboardLayout";
 import UserLayout from "@/layout/UserLayout";
 import React, { useEffect } from "react";
-import { connect, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./index.module.css";
 import { useRouter } from "next/router";
-import { connection } from "next/server";
 
 export default function MyConnectionsPage() {
   const dispatch = useDispatch();
@@ -21,7 +20,10 @@ export default function MyConnectionsPage() {
   }, []);
 
   useEffect(() => {
-    if (authState.connectionRequest.length != 0) {
+    if (
+      Array.isArray(authState.connectionRequest) &&
+      authState.connectionRequest.length !== 0
+    ) {
       console.log(authState.connectionRequest);
     }
   }, [authState.connectionRequest]);
@@ -33,11 +35,14 @@ export default function MyConnectionsPage() {
           style={{ display: "flex", flexDirection: "column", gap: "1.7rem" }}
         >
           <h4>My Connections</h4>
-          {authState.connectionRequest.length === 0 && (
-            <h1>No Connection Request Pending</h1>
-          )}
 
-          {authState.connectionRequest.length != 0 &&
+          {Array.isArray(authState.connectionRequest) &&
+            authState.connectionRequest.length === 0 && (
+              <h1>No Connection Request Pending</h1>
+            )}
+
+          {Array.isArray(authState.connectionRequest) &&
+            authState.connectionRequest.length !== 0 &&
             authState.connectionRequest
               .filter((connection) => connection.status_accepted === null)
               .map((user, index) => {
@@ -86,40 +91,43 @@ export default function MyConnectionsPage() {
                   </div>
                 );
               })}
+
           <h4>My Network</h4>
-          {authState.connectionRequest
-            .filter((connection) => connection.status_accepted !== null)
-            .map((user, index) => {
-              return (
-                <div
-                  onClick={() => {
-                    router.push(`/view_profile/${user.userId.username}`);
-                  }}
-                  className={styles.userCard}
-                  key={index}
-                >
+
+          {Array.isArray(authState.connectionRequest) &&
+            authState.connectionRequest
+              .filter((connection) => connection.status_accepted !== null)
+              .map((user, index) => {
+                return (
                   <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "1.2rem",
-                      justifyContent: "space-between",
+                    onClick={() => {
+                      router.push(`/view_profile/${user.userId.username}`);
                     }}
+                    className={styles.userCard}
+                    key={index}
                   >
-                    <div className={styles.profilePicture}>
-                      <img
-                        src={`${BASE_URL}/${user.userId.profilePicture}`}
-                        alt=""
-                      />
-                    </div>
-                    <div className={styles.userInfo}>
-                      <h3>{user.userId.name}</h3>
-                      <p>{user.userId.username}</p>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "1.2rem",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div className={styles.profilePicture}>
+                        <img
+                          src={`${BASE_URL}/${user.userId.profilePicture}`}
+                          alt=""
+                        />
+                      </div>
+                      <div className={styles.userInfo}>
+                        <h3>{user.userId.name}</h3>
+                        <p>{user.userId.username}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
         </div>
       </DashboardLayout>
     </UserLayout>

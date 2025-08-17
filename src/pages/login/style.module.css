@@ -1,81 +1,112 @@
 .container {
   display: flex;
   justify-content: center;
-  height: 90vh;
   align-items: center;
+  height: 90vh;
   background: snow;
 }
 
 .cardContainer {
-  height: 80vh;
   display: flex;
-  border-radius: 10px;
-  overflow: hidden;
   width: 80vw;
-  border-radius: 10px;
+  height: 80vh;
   background: white;
+  border-radius: 10px;
   box-shadow: 10px 10px 15px rgb(173, 173, 173);
+  overflow: hidden;
 }
 
 .cardContainer__left {
   flex: 0.6;
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
 }
 
 .cardleft__heading {
+  font-size: 2rem;
   font-weight: bold;
-  font-size: 1.8rem;
-}
-
-.inputField {
-  padding-inline: 1.3rem;
-  padding-block: 0.8rem;
-  outline: none;
-  border-radius: 10px;
-  border: 1px solid silver;
-  width: 100%;
+  margin-bottom: 1rem;
 }
 
 .inputContainer {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding-top: 1.3rem;
+  gap: 1.2rem;
   max-width: 400px;
   margin: 0 auto;
-  gap: 1.5rem;
+  width: 100%;
 }
 
-.inputRow {
-  width: fit-content;
-  display: flex;
-  gap: 1.2rem;
+.inputField {
+  padding: 0.8rem 1.3rem;
+  border: 1px solid silver;
+  border-radius: 10px;
+  width: 100%;
+  outline: none;
+  font-size: 1rem;
 }
 
-.buttonWithOutline {
+.button {
+  padding: 0.8rem 1.3rem;
+  background: #00488b;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.button:hover {
+  background: #003366;
+}
+
+.buttonAlt {
   padding: 0.8rem 1.3rem;
   background: rgb(236, 236, 236);
   width: 100%;
   border-radius: 10px;
   cursor: pointer;
+  border: none;
+  font-weight: bold;
+  color: #00488b;
+  transition: background 0.3s ease;
+}
+
+.buttonAlt:hover {
+  background: #e0e0e0;
 }
 
 .cardContainer__right {
   flex: 0.4;
   background: #00488b;
   display: flex;
-  justify-content: center;
-  color: white;
-  align-items: center;
   flex-direction: column;
-  gap: 1.2rem;
-  padding-inline: 1.2rem;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 2rem;
+  gap: 1rem;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 768px) {
   .cardContainer {
     flex-direction: column;
+    height: auto;
+    width: 90vw;
+  }
+
+  .cardContainer__right {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .cardContainer__left {
+    padding: 1.5rem;
   }
 }

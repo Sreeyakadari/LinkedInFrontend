@@ -1,54 +1,44 @@
+// File: src/pages/login.jsx
+
+import React, { useState, useEffect } from "react";
 import UserLayout from "@/layout/UserLayout";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import styles from "./style.module.css";
 import { loginUser, registerUser } from "@/config/redux/action/authAction";
 import { emptyMessage } from "@/config/redux/reducer/authReducer";
+import styles from "./style.module.css";
 
-function LoginComponent() {
-  const authState = useSelector((state) => state.auth);
-  const router = useRouter();
+const LoginComponent = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const { loggedIn, profileFetched, isError, message } = useSelector(
+    (state) => state.auth
+  );
 
-  const [userLoginMethod, setUserLoginMethod] = useState(false);
-  const [email, setEmailAddress] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
 
   useEffect(() => {
-    if (authState.loggedIn) {
-      router.push("/dashboard");
-    }
-  }, [authState.loggedIn]);
+    dispatch(emptyMessage());
+  }, [isLogin, dispatch]);
 
-  // Only redirect if the app actually knows you're logged in
   useEffect(() => {
-    if (authState.loggedIn) {
-      router.replace("/dashboard"); // replace avoids back button loop
-    }
-  }, [authState.loggedIn]);
-
-  // (Optional, and safer)
-  useEffect(() => {
-    if (authState.isTokenThere && authState.profileFetched) {
+    console.log("Login state →", { loggedIn, profileFetched });
+    if (loggedIn && profileFetched) {
       router.replace("/dashboard");
     }
-  }, [authState.isTokenThere, authState.profileFetched]);
+  }, [loggedIn, profileFetched, router]);
 
-  useEffect(() => {
-    dispatch(emptyMessage());
-  }, [userLoginMethod,dispatch]);
-
-  const handleRegister = () => {
-    console.log("registering");
-    dispatch(registerUser({ username, password, email, name }));
-  };
-
-  const handleLogin = () => {
-    console.log("Login");
-    dispatch(loginUser({ email, password }));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (isLogin) {
+      dispatch(loginUser({ email, password }));
+    } else {
+      dispatch(registerUser({ username, name, email, password }));
+    }
   };
 
   return (
@@ -56,75 +46,70 @@ function LoginComponent() {
       <div className={styles.container}>
         <div className={styles.cardContainer}>
           <div className={styles.cardContainer__left}>
-            <p className={styles.cardleft__heading}>
-              {userLoginMethod ? "Sign In" : "Sign Up"}
-            </p>
-            <p style={{ color: authState.isError ? "red" : "green" }}>
-              {authState.message.message}
-            </p>
-            <div className={styles.inputContainer}>
-              {!userLoginMethod && (
-                <div className={styles.inputRow}>
+            <h2 className={styles.cardleft__heading}>
+              {isLogin ? "Sign In" : "Sign Up"}
+            </h2>
+            {message?.message && (
+              <p style={{ color: isError ? "red" : "green" }}>
+                {message.message}
+              </p>
+            )}
+
+            <form onSubmit={handleSubmit} className={styles.inputContainer}>
+              {!isLogin && (
+                <>
                   <input
+                    type="text"
                     onChange={(e) => setUsername(e.target.value)}
-                    className={styles.inputField}
-                    type="text"
                     placeholder="Username"
-                  ></input>
-                  <input
-                    onChange={(e) => setName(e.target.value)}
                     className={styles.inputField}
+                    required
+                  />
+                  <input
                     type="text"
-                    placeholder="Name"
-                  ></input>
-                </div>
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Full Name"
+                    className={styles.inputField}
+                    required
+                  />
+                </>
               )}
               <input
-                onChange={(e) => setEmailAddress(e.target.value)}
-                className={styles.inputField}
-                type="text"
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
-              ></input>
-              <input
-                onChange={(e) => setPassword(e.target.value)}
                 className={styles.inputField}
+                required
+              />
+              <input
                 type="password"
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-              ></input>
-              <div
-                onClick={() => {
-                  if (userLoginMethod) {
-                    handleLogin();
-                  } else {
-                    handleRegister();
-                  }
-                }}
-                className={styles.buttonWithOutline}
-              >
-                <p>{userLoginMethod ? "Sign In" : "Sign Up"}</p>
-              </div>
-            </div>
+                className={styles.inputField}
+                required
+              />
+              <button type="submit" className={styles.button}>
+                {isLogin ? "Sign In" : "Sign Up"}
+              </button>
+            </form>
           </div>
+
           <div className={styles.cardContainer__right}>
-            {userLoginMethod ? (
-              <p>Don't Have an Account?</p>
-            ) : (
-              <p>Already Have an Account</p>
-            )}
-            <div
-              onClick={() => {
-                setUserLoginMethod(!userLoginMethod);
-              }}
-              style={{ color: "black", textAlign: "center" }}
-              className={styles.buttonWithOutline}
+            <p>
+              {isLogin ? "Don't have an account?" : "Already have an account?"}
+            </p>
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className={styles.buttonAlt}
+              type="button"
             >
-              <p>{userLoginMethod ? "Sign Up" : "Sign In"}</p>
-            </div>
+              {isLogin ? "Sign Up" : "Sign In"}
+            </button>
           </div>
         </div>
       </div>
     </UserLayout>
   );
-}
+};
 
 export default LoginComponent;

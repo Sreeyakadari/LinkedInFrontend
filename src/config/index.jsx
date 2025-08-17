@@ -1,7 +1,7 @@
 // frontend/src/config/index.jsx
 import axios from "axios";
 
-export const BASE_URL = "http://localhost:9090";
+export const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL ||  "http://localhost:9090";
 
 // Use this key name if your app already stores the JWT under it.
 // If you currently use a different key, adjust here.

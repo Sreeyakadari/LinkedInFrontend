@@ -2,7 +2,7 @@
 
 ## **Overview**
 
-This project implements a **LinkedIn Clone** with a frontend built using **React.js** and a backend powered by **Node.js** and **Express.js**. The system allows users to create profiles, send connection requests, message connections, and browse job postings.
+**LinkedIn Clone** frontend is built using **React.js** and a backend is built used **Node.js** and **Express.js**. The system allows users to create profiles, send connection requests, message connections, and browse job postings.
 
 ## **Technologies Used**
 

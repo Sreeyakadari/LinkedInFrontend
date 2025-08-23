@@ -1,40 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# **LinkedIn Clone Project**
 
-## Getting Started
+## **Overview**
 
-First, run the development server:
+This project implements a **LinkedIn Clone** with a frontend built using **React.js** and a backend powered by **Node.js** and **Express.js**. The system allows users to create profiles, send connection requests, message connections, and browse job postings.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## **Technologies Used**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Frontend:** React.js, Axios, CSS/Styled Components
+- **Backend:** Node.js, Express.js, MongoDB
+- **Authentication:** JWT (JSON Web Tokens)
+- **Real-Time Communication:** Socket.io (optional)
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+---
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## **Frontend**
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### **URL:** [LinkedInFrontend GitHub](https://github.com/Sreeyakadari/LinkedInFrontend)
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **Description:**
 
-## Learn More
+This is the frontend of the LinkedIn Clone application, built with **React.js**. It provides an interactive UI for users to sign up, log in, manage their profiles, send connection requests, view user posts.
 
-To learn more about Next.js, take a look at the following resources:
+### **Features:**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+- User-friendly sign-up and login forms
+- View and edit your LinkedIn profile
+- Send and manage connection requests
+- Browse user posts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### **Setup Instructions:**
 
-## Deploy on Vercel
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/Sreeyakadari/LinkedInFrontend.git
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Navigate into the project directory:**
+    ```bash
+    cd LinkedInFrontend
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+3. **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+4. **Start the development server:**
+    ```bash
+    npm start
+    ```
+
+5. Visit `http://localhost:3000` in your browser to interact with the application.
+
+---
